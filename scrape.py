@@ -27,18 +27,20 @@ driver.implicitly_wait(10)
 entries = get_entries(driver)
 driver.close()
 
-df = pd.DataFrame(
-    entries,
-    columns=[
-        "rank",
-        "champ",
-        "entry_id",
-        "current_points",
-        "percentile",
-        "maximum",
-        "round_score",
-    ],
-)
+rounds = len(entries[0]) - 6
+round_cols = ["r2", "r4", "r8", "r16", "r32", "r64"][-rounds:]
+
+columns = [
+    "rank",
+    "champ",
+    "entry_id",
+    "current_points",
+    "percentile",
+    "maximum",
+    *round_cols,
+]
+
+df = pd.DataFrame(entries, columns=columns)
 
 split = df.entry_id.str.split("\n")
 df.loc[:, "entry_name"] = split.map(lambda lst: lst[0])
@@ -56,7 +58,7 @@ df.loc[
         "entry_user",
         "current_points",
         "maximum",
-        "round_score",
+        *round_cols,
         "rank",
         "percentile",
     ],
