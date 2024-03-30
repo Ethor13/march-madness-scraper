@@ -5,6 +5,9 @@ import os
 import matplotlib.transforms as mtransforms
 from matplotlib.axes import Axes
 
+plt.ion()
+
+# PREPROCESS SCORES DF
 EXCLUDED_USERS = ["ESPNFAN8452492966"]
 
 NAME_MAPPER = {
@@ -54,6 +57,7 @@ no_games_mask = scores.index.get_level_values("time").to_series().ge(
 ) & scores.index.get_level_values("time").to_series().le(dt.datetime(2024, 3, 28, 20))
 
 scores = scores.loc[~no_games_mask.values]
+# END PREPROCESS SCORES DF
 
 # Create the Plot
 ax: Axes
@@ -124,8 +128,8 @@ vline_loc = (all_times >= jump_date).argmax()
 max_points = scores.current_points.max(0)
 ax.vlines(vline_loc, 0, max_points, colors="k", linestyles="--", lw=2)
 ax.text(
-    vline_loc - 7,
-    0.95 * max_points,
+    vline_loc - 8,
+    560,
     "Fast forward to\nSweet 16",
     color="black",
     fontweight="bold",
@@ -161,6 +165,19 @@ ax.tick_params(
 
 ax.legend(bbox_to_anchor=(1.15, 1.05))
 
-# Show/Save the plot
-fig.savefig("mm.png", bbox_inches="tight")
-plt.show()
+# Interactive
+# ax.set_autoscale_on(True)
+
+# for i, t in enumerate(all_times):
+#     ax.set_xlim(0, i)
+#     ax.set_ylim(0, scores.loc[(slice(None), t), "current_points"].max() + 10)
+
+#     # Need both of these in order to rescale
+#     ax.relim()
+#     ax.autoscale_view()
+#     # We need to draw *and* flush
+#     fig.canvas.draw()
+#     fig.canvas.flush_events()
+
+#     fig.savefig(f"gif-frames/{i:03}.png", bbox_inches="tight")
+#     exit(0)

@@ -82,7 +82,6 @@ class DynamicUpdate:
 
     def on_running(self, xdata, ydata):
         # Update data (with the new _and_ the old points)
-        print(type(self.lines))
         self.lines.set_xdata(xdata)
         self.lines.set_ydata(ydata)
         # Need both of these in order to rescale
