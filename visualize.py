@@ -5,9 +5,7 @@ import os
 import matplotlib.transforms as mtransforms
 from matplotlib.axes import Axes
 
-EXCLUDED_USERS = [
-    "ESPNFAN8452492966"
-]
+EXCLUDED_USERS = ["ESPNFAN8452492966"]
 
 NAME_MAPPER = {
     "ESPNFAN4288357771's Picks 1": "John's Picks",
@@ -29,22 +27,20 @@ for score in scores_dir:
 
     scores.append(df)
 scores = pd.concat(scores).sort_index()
-scores.loc[:, "entry_name"] = (
-    scores.entry_name
-    .map(NAME_MAPPER)
-    .where(scores.entry_name.isin(NAME_MAPPER), scores.entry_name)
+scores.loc[:, "entry_name"] = scores.entry_name.map(NAME_MAPPER).where(
+    scores.entry_name.isin(NAME_MAPPER), scores.entry_name
 )
 
 desired_time_range = pd.date_range(
     scores.index.get_level_values("time").min(),
     scores.index.get_level_values("time").max(),
-    freq="H"
+    freq="H",
 )
 
-desired_index = pd.MultiIndex.from_product([
-    scores.index.get_level_values("entry_user").unique(),
-    desired_time_range
-], names=["entry_user", "time"])
+desired_index = pd.MultiIndex.from_product(
+    [scores.index.get_level_values("entry_user").unique(), desired_time_range],
+    names=["entry_user", "time"],
+)
 
 scores = (
     scores.align(pd.DataFrame([], index=desired_index))[0]
@@ -53,10 +49,9 @@ scores = (
 )
 
 # TODO: Customize this
-no_games_mask = (
-    scores.index.get_level_values("time").to_series().ge(dt.datetime(2024, 3, 25, 12))
-    & scores.index.get_level_values("time").to_series().le(dt.datetime(2024, 3, 28, 20))
-)
+no_games_mask = scores.index.get_level_values("time").to_series().ge(
+    dt.datetime(2024, 3, 25, 12)
+) & scores.index.get_level_values("time").to_series().le(dt.datetime(2024, 3, 28, 20))
 
 scores = scores.loc[~no_games_mask.values]
 
@@ -65,17 +60,22 @@ ax: Axes
 fig, ax = plt.subplots(1, 1, figsize=(12, 8))
 
 # Create Labels
-current_scores = scores.groupby(scores.index.get_level_values("entry_user")).current_points.max()
-users_by_score = current_scores.reset_index().groupby("current_points").agg(list).entry_user
+current_scores = scores.groupby(
+    scores.index.get_level_values("entry_user")
+).current_points.max()
+users_by_score = (
+    current_scores.reset_index().groupby("current_points").agg(list).entry_user
+)
 
 # Sort by Score
 scores = scores.loc[users_by_score.apply(lambda lst: lst[::-1]).explode()[::-1]]
 
+
 def get_label(users):
     if len(users) == 1:
-        return scores.loc[users[0], "entry_name"].iloc[0], mtransforms.ScaledTranslation(
-            1 / 12, -1 / 24, fig.dpi_scale_trans
-        )
+        return scores.loc[users[0], "entry_name"].iloc[
+            0
+        ], mtransforms.ScaledTranslation(1 / 12, -1 / 24, fig.dpi_scale_trans)
     elif len(users) > 1:
         return f"{len(users)}-way tie", mtransforms.ScaledTranslation(
             1 / 12, -1 / 24, fig.dpi_scale_trans
@@ -92,7 +92,11 @@ labels = users_by_score.apply(get_label)
 
 # Plot each line separately
 for i, entry_user in enumerate(scores.index.get_level_values("entry_user").unique()):
-    ax.plot(range(scores.loc[entry_user].index.size), scores.current_points.loc[entry_user], label=scores.entry_name.loc[entry_user].iloc[-1])
+    ax.plot(
+        range(scores.loc[entry_user].index.size),
+        scores.current_points.loc[entry_user],
+        label=scores.entry_name.loc[entry_user].iloc[-1],
+    )
 
 # Add the labels
 for value, (label, transform) in labels.items():
@@ -103,6 +107,8 @@ for value, (label, transform) in labels.items():
         color="black",
         transform=ax.transData + transform,
         fontsize=8,
+        clip_box=ax.clipbox,
+        clip_on=True,
     )
 
 # Add Text
@@ -125,12 +131,14 @@ ax.text(
     fontweight="bold",
     fontsize=10,
     ha="center",
+    clip_box=ax.clipbox,
+    clip_on=True,
 )
 
 # TODO: Customize this
 rng = range(0, len(all_times), 12)
-all_times = all_times[rng]
-xticklabels = all_times.map(lambda date: date.strftime("%H:00\n%m-%d"))
+xtick_times = all_times[rng]
+xticklabels = xtick_times.map(lambda date: date.strftime("%H:00\n%m-%d"))
 
 ax.set_xticks(rng)
 ax.set_xticklabels(xticklabels)
@@ -154,5 +162,5 @@ ax.tick_params(
 ax.legend(bbox_to_anchor=(1.15, 1.05))
 
 # Show/Save the plot
-fig.savefig("mm.png", bbox_inches='tight')
+fig.savefig("mm.png", bbox_inches="tight")
 plt.show()
