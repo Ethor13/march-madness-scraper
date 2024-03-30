@@ -163,21 +163,21 @@ ax.tick_params(
     labelleft=True,
 )
 
-ax.legend(bbox_to_anchor=(1.15, 1.05))
+# ax.legend(bbox_to_anchor=(1.15, 1.05))
+plt.show()
 
 # Interactive
-# ax.set_autoscale_on(True)
+ax.set_autoscale_on(True)
 
-# for i, t in enumerate(all_times):
-#     ax.set_xlim(0, i)
-#     ax.set_ylim(0, scores.loc[(slice(None), t), "current_points"].max() + 10)
+for i, t in enumerate(all_times):
+    ax.set_xlim(0, i)
+    ax.set_ylim(0, scores.loc[(slice(None), t), "current_points"].max() + 10)
 
-#     # Need both of these in order to rescale
-#     ax.relim()
-#     ax.autoscale_view()
-#     # We need to draw *and* flush
-#     fig.canvas.draw()
-#     fig.canvas.flush_events()
+    # Need both of these in order to rescale
+    ax.relim()
+    ax.autoscale_view()
+    # We need to draw *and* flush
+    fig.canvas.draw()
+    fig.canvas.flush_events()
 
-#     fig.savefig(f"gif-frames/{i:03}.png", bbox_inches="tight")
-#     exit(0)
+    fig.savefig(f"gif-frames/{i:03}.png", bbox_inches="tight")
