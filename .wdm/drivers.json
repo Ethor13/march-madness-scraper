@@ -4,7 +4,7 @@
         "binary_path": ".\\.wdm\\drivers\\edgedriver\\win64\\122.0.2365\\msedgedriver.exe"
     },
     "win64_edgedriver_123.0.2420_for_123.0.2420": {
-        "timestamp": "07/04/2024",
+        "timestamp": "08/04/2024",
         "binary_path": ".\\.wdm\\drivers\\edgedriver\\win64\\123.0.2420\\msedgedriver.exe"
     }
 }
